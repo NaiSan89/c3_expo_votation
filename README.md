@@ -1,6 +1,6 @@
 # Votação presencial · Canal 3 Expo
 
-Formulário de votação presencial da Canal 3 Expo. O participante autoriza a localização, escolhe um dos 26 jogos e envia seu voto. A organização acompanha a apuração pelo painel `/admin` e pode exportar os resultados em CSV.
+Formulário de votação presencial da Canal 3 Expo. O participante autoriza a localização, escolhe um dos jogos do festival e envia seu voto. A organização acompanha a apuração pelo painel `/admin` e pode exportar os resultados em CSV.
 
 O projeto usa Node.js 24 ou superior, com SQLite para execução local e PostgreSQL para hospedagem na Vercel. A integração com Google Sheets é opcional.
 

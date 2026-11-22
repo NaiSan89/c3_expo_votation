@@ -70,11 +70,11 @@ test('organização pode zerar votos de teste e repetir com o mesmo navegador no
   await checkReset(app, app);
 });
 
-test('serve interface, 26 jogos e painel sem expor resultados ou arquivos internos', async t => {
+test('serve interface, lista de jogos e painel sem expor resultados ou arquivos internos', async t => {
   const { get } = await start(t);
   const page = await get('/'); assert.equal(page.status, 200); assert.match(await page.text(), /Qual jogo conquistou/);
   assert.match(page.headers.get('content-security-policy'), /frame-ancestors 'none'/);
-  assert.equal((await (await get('/api/config')).json()).games.length, 26);
+  assert.deepEqual((await (await get('/api/config')).json()).games, games);
   assert.equal((await get('/admin')).status, 200);
   assert.equal((await get('/api/admin/results')).status, 401);
   for (const path of ['/.env', '/server.js', '/data/votes.sqlite', '/games.json', '/%2e%2e/server.js']) assert.equal((await get(path)).status, 404);
@@ -82,13 +82,13 @@ test('serve interface, 26 jogos e painel sem expor resultados ou arquivos intern
 test('aceita voto dentro da área, protege resultados e impede repetição concorrente', async t => {
   const { post, session, get } = await start(t);
   const { token, cookie } = await session();
-  const payload = { token, game: games[0], consent: true, position: position() };
+  const payload = { token, game: 'Goblin Game', consent: true, position: position() };
   assert.equal((await post('/api/location', payload, cookie)).status, 200);
   const responses = await Promise.all([post('/api/votes', payload, cookie), post('/api/votes', payload, cookie)]);
   assert.deepEqual(responses.map(response => response.status).sort(), [201, 409]);
   assert.equal((await post('/api/session', {}, cookie)).status, 409);
   const results = await (await get('/api/admin/results', { Authorization: `Bearer ${adminToken}` })).json();
-  assert.equal(results.total, 1); assert.equal(results.results[0].game, games[0]); assert.equal(results.sync.enabled, false);
+  assert.equal(results.total, 1); assert.equal(results.results[0].game, payload.game); assert.equal(results.sync.enabled, false);
   const csv = await get('/api/admin/results?format=csv', { Authorization: `Bearer ${adminToken}` });
   assert.match(csv.headers.get('content-disposition'), /resultados.csv/); assert.match(await csv.text(), /Tuned Turtle/);
 });

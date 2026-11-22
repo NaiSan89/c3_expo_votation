@@ -90,8 +90,15 @@ function buildGames() {
     input.type = 'radio'; input.name = 'game'; input.value = game; input.id = `game-${index}`;
     const copy = document.createElement('span'); copy.className = 'game-copy';
     const title = document.createElement('span'); title.className = 'game-title'; title.textContent = game.replace(/\s*\((INDIE|RETRO)\)\s*$/, '').trim();
-    const badge = document.createElement('span'); badge.className = `game-category ${game.includes('(RETRO)') ? 'retro' : ''}`; badge.textContent = game.includes('(RETRO)') ? 'RETRO' : 'INDIE';
-    copy.append(title, badge); label.append(input, copy); $('#games-list').append(label);
+    copy.append(title);
+    const categoryName = game.match(/\((INDIE|RETRO)\)\s*$/)?.[1];
+    if (categoryName) {
+      const badge = document.createElement('span');
+      badge.className = `game-category ${categoryName.toLowerCase()}`;
+      badge.textContent = categoryName;
+      copy.append(badge);
+    }
+    label.append(input, copy); $('#games-list').append(label);
     input.addEventListener('change', () => {
       chosenGame = game;
       $('#selected-game').textContent = title.textContent;
